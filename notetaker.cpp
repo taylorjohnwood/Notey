@@ -1,4 +1,5 @@
 #include "notetaker.h"
+#include "pdfdocument.h"
 #include "ui_notetaker.h"
 
 NoteTaker::NoteTaker(QWidget *parent)
@@ -6,11 +7,21 @@ NoteTaker::NoteTaker(QWidget *parent)
     , ui(new Ui::NoteTaker)
 {
     ui->setupUi(this);
-    this->setCentralWidget(ui->mainTextEdit);
+    this->setCentralWidget(ui->centralwidget);
+
+    scene = new QGraphicsScene(this);
+
+    document = loadDocument("/home/taylor/Projects/NoteTaker/Calculus_Cheat_Sheet.pdf");
+
+    pages = loadPagesAsPixmap(document);
+
+    setViewPixmap((*pages)[0]);
 }
 
 NoteTaker::~NoteTaker()
 {
+    delete document;
+    delete pages;
     delete ui;
 }
 
@@ -31,15 +42,14 @@ void NoteTaker::on_actionOpen_triggered()
         QMessageBox::warning(this, "Warning", "Cannot open file : " + file.errorString());
         return;
     }
-    this->setWindowTitle(currentFile);
+    setWindowTitle(currentFile);
     QTextStream in(&file);
     QString text = in.readAll();
-    this->ui->mainTextEdit->setPlainText(text);
+    ui->mainTextEdit->setPlainText(text);
 
     file.close();
 
 }
-
 
 void NoteTaker::on_actionSave_As_triggered()
 {
@@ -85,6 +95,36 @@ void NoteTaker::on_actionSave_triggered()
     QTextStream out{&file};
 
     out << ui->mainTextEdit->toPlainText();
+
+    delete document;
+    delete pages;
+
+    document = loadDocument(currentFile.left(currentFile.size()-3) + "pdf");
+    pages = loadPagesAsPixmap(document);
+    setViewPixmap((*pages)[0]);
     file.close();
 
+}
+
+void NoteTaker::setViewPixmap(QPixmap pixmap){
+    /*
+     * Sets the pixmap image for the graphics view widget.
+     * Used to display the pdf pages.
+     */
+
+    scene->addPixmap(pixmap);
+    scene->setSceneRect(pixmap.rect());
+    ui->pdfView->setScene(scene);
+
+}
+
+void NoteTaker::keyPressEvent(QKeyEvent *event){
+
+    if (event->key() == Qt::Key_F5){
+        if(ui->pdfView->isVisible()){
+            ui->pdfView->setVisible(false);
+        }else{
+            ui->pdfView->setVisible(true);
+        }
+    }
 }

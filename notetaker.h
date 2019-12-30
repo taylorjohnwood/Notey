@@ -7,6 +7,11 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QKeyEvent>
+#include <QGraphicsScene>
+#include <vector>
+#include <poppler/qt5/poppler-qt5.h>
+
 
 
 QT_BEGIN_NAMESPACE
@@ -20,6 +25,8 @@ class NoteTaker : public QMainWindow
 public:
     NoteTaker(QWidget *parent = nullptr);
     ~NoteTaker();
+
+
 
 private slots:
     void on_actionNew_triggered();
@@ -35,5 +42,12 @@ private slots:
 private:
     Ui::NoteTaker *ui;
     QString currentFile{""};
+    Poppler::Document* document;
+    std::vector<QPixmap>* pages;
+    QGraphicsScene* scene;
+
+
+    void setViewPixmap(QPixmap pixmap);
+    void keyPressEvent(QKeyEvent *event);
 };
 #endif // NOTETAKER_H
