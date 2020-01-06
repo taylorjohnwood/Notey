@@ -3,15 +3,15 @@
 Poppler::Document* loadDocument(QString path)
 {
 
-    QTextStream(stdout) << path;
+    QTextStream(stdout) << "Loading pdf:" << path;
 
     //Load the pdf using the poppler library
     Poppler::Document* document{Poppler::Document::load(path)};
 
     //Check if the document is locked
     if (!document || document->isLocked()){
-
         delete document;
+        return nullptr;
     }
 
     document->setRenderHint( Poppler::Document::Antialiasing );
@@ -43,4 +43,10 @@ std::vector<QPixmap>* loadPagesAsPixmap(Poppler::Document* document)
 
     //Return the pages
     return pages;
+}
+
+
+void createDocumentFromTex(QString path){
+
+
 }

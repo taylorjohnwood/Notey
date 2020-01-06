@@ -10,12 +10,6 @@ NoteTaker::NoteTaker(QWidget *parent)
     this->setCentralWidget(ui->centralwidget);
 
     scene = new QGraphicsScene(this);
-
-    document = loadDocument("/home/taylor/Projects/NoteTaker/Calculus_Cheat_Sheet.pdf");
-
-    pages = loadPagesAsPixmap(document);
-
-    setViewPixmap((*pages)[0]);
 }
 
 NoteTaker::~NoteTaker()
@@ -25,18 +19,19 @@ NoteTaker::~NoteTaker()
     delete ui;
 }
 
-
 void NoteTaker::on_actionNew_triggered()
 {
     this->currentFile.clear();
     ui->mainTextEdit->setPlainText(QString());
+    currentFile = "";
 }
 
 void NoteTaker::on_actionOpen_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open the file");
-    currentFile = filename;
-    QFile file{filename};
+    currentFile = QFileDialog::getOpenFileName(this, "Open the file","/home/taylor/Doc");
+
+    QTextStream(stdout) << "Opening file: " << currentFile;
+    QFile file{currentFile};
 
     if(!file.open(QIODevice::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot open file : " + file.errorString());
@@ -44,8 +39,16 @@ void NoteTaker::on_actionOpen_triggered()
     }
     setWindowTitle(currentFile);
     QTextStream in(&file);
-    QString text = in.readAll();
-    ui->mainTextEdit->setPlainText(text);
+    ui->mainTextEdit->setPlainText(in.readAll());
+
+    //Load the pdfTaylor J Wood
+    document = loadDocument(currentFile.left(currentFile.lastIndexOf('.')) + ".pdf");
+    if (document != nullptr){
+        pages = loadPagesAsPixmap(document);
+
+        //Display the pdf
+        setViewPixmap((*pages)[0]);
+    }
 
     file.close();
 
@@ -86,24 +89,52 @@ void NoteTaker::on_actionExit_triggered()
 
 void NoteTaker::on_actionSave_triggered()
 {
+
+    //Open a text file to write editor contents to
     QFile file{currentFile};
 
+    // Make sure that it opened correctly
     if(!file.open(QIODevice::WriteOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Save file : " + file.errorString());
         return;
     }
+
+    // Create a text stream to write to the file
     QTextStream out{&file};
 
+    //Write the contents of the editor to the file
     out << ui->mainTextEdit->toPlainText();
 
-    delete document;
-    delete pages;
-
-    document = loadDocument(currentFile.left(currentFile.size()-3) + "pdf");
-    pages = loadPagesAsPixmap(document);
-    setViewPixmap((*pages)[0]);
+    //Close the file after writing to it
     file.close();
 
+
+
+    //If a pdf document already is open close it
+    if (document != nullptr){
+        delete document;
+        document = nullptr;
+    }
+
+    //Clear the pdf's pages from memory aswell
+    if (pages != nullptr){
+        delete pages;
+        pages = nullptr;
+    }
+
+    QTextStream(stdout) << '\n' <<currentFile.left(currentFile.lastIndexOf('.')) << '\n';
+    //Compile the .tex file into a pdf
+    std::system(
+                "latexmk --pdf --cd --interaction=batchmode "
+                + currentFile.toUtf8()
+                );
+
+    //Load the pdfTaylor J Wood
+    document = loadDocument(currentFile.left(currentFile.lastIndexOf('.')) + ".pdf");
+    pages = loadPagesAsPixmap(document);
+
+    //Display the pdf
+    setViewPixmap((*pages)[0]);
 }
 
 void NoteTaker::setViewPixmap(QPixmap pixmap){

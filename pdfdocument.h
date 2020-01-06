@@ -12,5 +12,5 @@
 
 Poppler::Document* loadDocument(QString path);
 std::vector<QPixmap>* loadPagesAsPixmap(Poppler::Document* document);
-
+void createDocumentFromTex(QString path);
 #endif // PDFDOCUMENT_H
