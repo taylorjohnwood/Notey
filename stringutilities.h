@@ -1,11 +1,8 @@
 #ifndef STRINGMANIPULATION_H
 #define STRINGMANIPULATION_H
 
+#include <QString>
 
-class stringManipulation
-{
-public:
-    stringManipulation();
-};
+QString withFileExtension(QString path, QString extension);
 
 #endif // STRINGMANIPULATION_H

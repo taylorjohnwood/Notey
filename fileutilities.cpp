@@ -1,44 +1,37 @@
-#include "pdfdocument.h"
+#include "fileutilities.h"
 
-Poppler::Document* loadDocument(QString path)
+std::unique_ptr<Poppler::Document> loadDocument(QString path)
 {
-
-    QTextStream(stdout) << "Loading pdf:" << path;
-
     //Load the pdf using the poppler library
-    Poppler::Document* document{Poppler::Document::load(path)};
+    std::unique_ptr<Poppler::Document> document{Poppler::Document::load(path)};
 
     //Check if the document is locked
     if (!document || document->isLocked()){
-        delete document;
+        document.reset();
         return nullptr;
     }
 
-    document->setRenderHint( Poppler::Document::Antialiasing );
-    document->setRenderHint( Poppler::Document::TextAntialiasing );
-    document->setRenderHint( Poppler::Document::TextHinting );
+    document->setRenderHint( Poppler::Document::Antialiasing);
+    document->setRenderHint( Poppler::Document::TextAntialiasing);
+    document->setRenderHint( Poppler::Document::TextHinting);
 
     return document;
 }
 
-std::vector<QPixmap>* loadPagesAsPixmap(Poppler::Document* document)
+std::unique_ptr<std::vector<QPixmap>> loadPagesAsPixmap(std::unique_ptr<Poppler::Document> &document)
 {
-    std::vector<QPixmap>* pages{new std::vector<QPixmap>};
+    std::unique_ptr<std::vector<QPixmap>> pages{new std::vector<QPixmap>};
     for(int i{0}; i < document->numPages();i++){
 
         //Get the i'th page
         Poppler::Page* page{document->page(i)};
 
-        //Load it as a pixmap
-        QPixmap pixmap = QPixmap::fromImage(
-                    page->renderToImage(72.0,72.0,0,0,page->pageSize().width(),page->pageSize().height())
-                    );
+         //Add the pixmap image to the vectors
+         pages->push_back(QPixmap::fromImage(
+                    page->renderToImage(120.0,120.0)));
 
         //Delete the page
         delete page;
-
-        //Add the pixmap image to the vectors
-        pages->push_back(pixmap);
     }
 
     //Return the pages
@@ -46,7 +39,28 @@ std::vector<QPixmap>* loadPagesAsPixmap(Poppler::Document* document)
 }
 
 
-void createDocumentFromTex(QString path){
+int saveTextToFile(QString text, QString path){
+    // Open a file in that location
+    QFile file{path};
 
+    //Check to see if file opened correctly
+    if(!file.open(QIODevice::WriteOnly | QFile::Text)){
+        return false;
+    }
+
+    // Write the contents of the text edit to the file
+    QTextStream(&file) << text;
+
+    //Close the file
+    file.close();
+    return true;
+}
+
+void createPdfFromTex(QString path){
+    //Compile the .tex file into a pdf
+    std::system(
+                "latexmk --pdf --cd --interaction=batchmode "
+                + path.toUtf8()
+                );
 
 }

@@ -17,13 +17,21 @@ DEFINES += DQT_NO_VERSION_TAGGING
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    environments.cpp \
+    fileutilities.cpp \
+    highlighter.cpp \
     main.cpp \
     notetaker.cpp \
-    pdfdocument.cpp
+    snippets.cpp \
+    stringutilities.cpp
 
 HEADERS += \
+    environments.h \
+    fileutilities.h \
+    highlighter.h \
     notetaker.h \
-    pdfdocument.h
+    snippets.h \
+    stringutilities.h
 
 FORMS += \
     notetaker.ui

@@ -1,6 +1,5 @@
-#include "stringmanipulation.h"
+#include "stringutilities.h"
 
-stringManipulation::stringManipulation()
-{
-
+QString withFileExtension(QString path, QString extension){
+    return path.left(path.lastIndexOf('.')) + "." + extension;
 }
