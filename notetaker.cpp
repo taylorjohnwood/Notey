@@ -259,24 +259,47 @@ void NoteTaker::on_mainTextEdit_textChanged()
 {
     QString word{""};
     QTextCursor cursor = ui->mainTextEdit->textCursor();
-    int i = cursor.position();
+    int i = cursor.position()-1;
     QString text = ui->mainTextEdit->toPlainText();
-    do{
+    while((text[i]!=' ') && (text[i]!='\n') && (i>=0)){
+        word.prepend(text[i]);
         i--;
         if(i<0){
             break;
         }
-        word.prepend(text[i]);
-    }while((text[i]!=' ') && (text[i]!='\n') && (i>0));
+    }
     QTextStream(stdout) << word << '\n';
     if (word=="dm"){
-        QString environment = "\\[\n{$1}\n\\]";
-        int index = environment.indexOf("{$1}");
-        environment = environment.remove(QRegularExpression("\\{\\$\\d\\}"));
+
+        // Get a copy of the text cursor
         QTextCursor cursor = ui->mainTextEdit->textCursor();
-        ui->mainTextEdit->setPlainText(ui->mainTextEdit->toPlainText().remove(ui->mainTextEdit->toPlainText().length()-2,2));
+
+        //Save its position before inserting snippet
+        int currentPos = cursor.position();
+
+        //The environment to insert
+        QString environment = """\\[\n"
+                              "{$1}\n"
+                              "\\]""";
+
+        //Get the desired position of the cursor after inserting
+        int posOffset = environment.indexOf("{$1}");
+
+        QTextStream(stdout) << posOffset << " " << currentPos;
+
+        //Remove the position indicators from the text
+        environment = environment.remove(QRegularExpression("\\{\\$\\d\\}"));
+
+        //Remove the snippet trigger
+        ui->mainTextEdit->setPlainText(ui->mainTextEdit->toPlainText().remove(ui->mainTextEdit->toPlainText().length()-2,2)); //This is causing buggy behaviour
+
+        //Insert the snippet
         ui->mainTextEdit->insertPlainText(environment);
-        cursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::MoveAnchor, environment.length() - index);
+
+        //Update the cursor position
+        cursor.setPosition(currentPos + posOffset -2); //Minus two because the dm text is deleted
+
+        //Apply the changed cursor to the actual text cursor
         ui->mainTextEdit->setTextCursor(cursor);
     }
 
