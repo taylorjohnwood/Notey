@@ -59,19 +59,27 @@ private slots:
 
     void on_mainTextEdit_textChanged();
 
+    void focusMainTextEdit();
+
 private:
+
     Ui::NoteTaker* ui;
     Highlighter *highlighter;
     QString currentFile{""};
     QInputDialog *envInput;
     QCompleter *envCompleter;
+    double zoom;
+
+
     std::unique_ptr<Poppler::Document> document;
     std::unique_ptr<std::vector<QPixmap>> pages;
-    std::unique_ptr<QGraphicsScene> scene;
+    std::unique_ptr<QGraphicsScene> scene{};
 
     void setPdfFromFilename(QString filename);
     void setPdfView(QPixmap pixmap);
     void initGUI();
     void initEnvironmentInput();
+    void insertSnippet(QString snippet, int triggerLength);
+    void setupSignalsAndSlots();
 };
 #endif // NOTETAKER_H

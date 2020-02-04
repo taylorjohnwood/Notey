@@ -20,8 +20,10 @@ SOURCES += \
     environments.cpp \
     fileutilities.cpp \
     highlighter.cpp \
+    latextexteditor.cpp \
     main.cpp \
     notetaker.cpp \
+    pdfview.cpp \
     snippets.cpp \
     stringutilities.cpp
 
@@ -29,7 +31,9 @@ HEADERS += \
     environments.h \
     fileutilities.h \
     highlighter.h \
+    latextexteditor.h \
     notetaker.h \
+    pdfview.h \
     snippets.h \
     stringutilities.h
 
