@@ -2,13 +2,23 @@
 
 LatexTextEditor::LatexTextEditor(QWidget *parent) : QTextEdit(parent)
 {
+    //Create the text editors snippet controller
+    snipCont.reset(new SnippetController);
 
+
+    //Run the snippet controller when the text is changed
+    QObject::connect(this, &LatexTextEditor::textChanged,
+                     this, &LatexTextEditor::runSnippetController);
 }
 
 LatexTextEditor::~LatexTextEditor(){
 
 }
 
+void LatexTextEditor::runSnippetController(){
+    QTextStream(stdout) << "Snippet Controller called";
+
+}
 
 void LatexTextEditor::keyPressEvent(QKeyEvent *event){
 

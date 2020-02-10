@@ -1,6 +1,7 @@
 #include "snippetcontroller.h"
 
-snippetController::snippetController()
+SnippetController::SnippetController():
+    QObject()
 {
 
 }

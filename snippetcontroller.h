@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-class snippetController
+class SnippetController : QObject
 {
     Q_OBJECT
 public:
-    snippetController();
+     SnippetController();
 };
 
 #endif // SNIPPETCONTROLLER_H

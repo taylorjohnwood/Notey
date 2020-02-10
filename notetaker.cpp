@@ -35,11 +35,15 @@ void NoteTaker::initGUI(){
 }
 
 void NoteTaker::setupSignalsAndSlots(){
+
+    //Allow latex text editor to give up focus to the pdfView
     connect(ui->mainTextEdit, &LatexTextEditor::focusToggled,
                      ui->pdfView, QOverload<>::of(&PdfView::setFocus));
 
+    //Allow pdfView to give up focus to the latex text editor
     connect(ui->pdfView, &PdfView::focusToggled,
                      ui->mainTextEdit, QOverload<>::of(&LatexTextEditor::setFocus) );
+
 
 }
 

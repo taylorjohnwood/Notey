@@ -6,6 +6,9 @@
 #include <QtEvents>
 #include <QWidget>
 #include <QObject>
+#include <memory>
+#include "snippetcontroller.h"
+
 class LatexTextEditor : public QTextEdit{
     Q_OBJECT
 
@@ -16,8 +19,13 @@ public:
 signals:
      void focusToggled();
 
+public slots:
+     void runSnippetController();
+
 private:
     void keyPressEvent(QKeyEvent *event);
+
+    std::unique_ptr<SnippetController> snipCont;
 };
 
 #endif // LATEXTEXTEDITOR_H
