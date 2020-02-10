@@ -2,8 +2,10 @@
 #define NOTETAKER_H
 
 #include <QMainWindow>
-
+#include <QWidget>
+#include <QObject>
 #include <QFile>
+#include <QtGlobal>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QTextStream>
@@ -17,6 +19,12 @@
 #include <poppler/qt5/poppler-qt5.h>
 #include <memory>
 #include <highlighter.h>
+
+#include "fileutilities.h"
+#include "stringutilities.h"
+#include "ui_notetaker.h"
+#include "pdfview.h"
+#include "latextexteditor.h"
 
 
 
@@ -59,7 +67,6 @@ private slots:
 
     void on_mainTextEdit_textChanged();
 
-    void focusMainTextEdit();
 
 private:
 
@@ -71,7 +78,7 @@ private:
     double zoom;
 
 
-    std::unique_ptr<Poppler::Document> document;
+//    std::unique_ptr<Poppler::Document> document;
     std::unique_ptr<std::vector<QPixmap>> pages;
     std::unique_ptr<QGraphicsScene> scene{};
 
@@ -81,5 +88,7 @@ private:
     void initEnvironmentInput();
     void insertSnippet(QString snippet, int triggerLength);
     void setupSignalsAndSlots();
+
+
 };
 #endif // NOTETAKER_H

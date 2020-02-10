@@ -11,7 +11,7 @@
 #include <memory>
 #include <poppler/qt5/poppler-qt5.h>
 
-std::unique_ptr<Poppler::Document> loadPdf(QString path);
+
 
 std::unique_ptr<std::vector<QPixmap>> loadPagesAsPixmap(std::unique_ptr<Poppler::Document> &document, double &zoom);
 

@@ -1,16 +1,13 @@
 #include "notetaker.h"
-#include "fileutilities.h"
-#include "stringutilities.h"
-#include "ui_notetaker.h"
-#include "pdfview.h"
+
 
 NoteTaker::NoteTaker(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::NoteTaker)
 {
     initGUI();
-
-
+    setupSignalsAndSlots();
+    initEnvironmentInput();
 }
 
 NoteTaker::~NoteTaker()
@@ -25,9 +22,6 @@ void NoteTaker::initGUI(){
      ui->setupUi(this);
      setCentralWidget(ui->centralwidget);
 
-     setupSignalsAndSlots();
-
-
     //Syntax Highlighter object
     highlighter = new Highlighter(ui->mainTextEdit->document());
 
@@ -37,16 +31,18 @@ void NoteTaker::initGUI(){
     //Create a graphic scene for the pdf document
     scene.reset(new QGraphicsScene);
 
-    //Initialise the environment input dialogue
-    initEnvironmentInput();
-
     zoom = 240;
 }
 
 void NoteTaker::setupSignalsAndSlots(){
-    QObject::connect(ui->pdfView, &PdfView::focusToggled,
-                     this, &NoteTaker::focusMainTextEdit);
+    connect(ui->mainTextEdit, &LatexTextEditor::focusToggled,
+                     ui->pdfView, QOverload<>::of(&PdfView::setFocus));
+
+    connect(ui->pdfView, &PdfView::focusToggled,
+                     ui->mainTextEdit, QOverload<>::of(&LatexTextEditor::setFocus) );
+
 }
+
 void NoteTaker::initEnvironmentInput(){
 
     //Create the input widget, which user types environment into
@@ -68,9 +64,6 @@ void NoteTaker::initEnvironmentInput(){
 
     //Attatch the autocompleter object to it
     textInput->setCompleter(envCompleter);
-}
-void NoteTaker::focusMainTextEdit(){
-    ui->mainTextEdit->setFocus();
 }
 
 void NoteTaker::on_actionNew_triggered()
@@ -122,12 +115,10 @@ void NoteTaker::on_actionOpen_triggered()
 
 
     //Load the corresponding pdf file for the .tex file
-    document = loadPdf((currentFile.left(currentFile.length()-3)+"pdf"));
+    std::unique_ptr<Poppler::Document> document = loadPdf((currentFile.left(currentFile.length()-3)+"pdf"));
 
-    if (document != nullptr){
-        pages = loadPagesAsPixmap(document,zoom);
-        setPdfView(pages->at(0));
-    }
+    ui->pdfView->setDocument(document);
+    ui->pdfView->displayPage(ui->pdfView->currentPage);
 }
 
 void NoteTaker::on_actionSave_As_triggered()
@@ -147,12 +138,10 @@ void NoteTaker::on_actionSave_As_triggered()
      createPdfFromTex(currentFile);
 
      //Load the corresponding pdf file for the .tex file
-     document = loadPdf(currentFile.left(currentFile.length()-3)+"pdf");
+     std::unique_ptr<Poppler::Document> document = loadPdf((currentFile.left(currentFile.length()-3)+"pdf"));
 
-     if (document != nullptr){
-         pages = loadPagesAsPixmap(document,zoom);
-         setPdfView(pages->at(0));
-     }
+     ui->pdfView->setDocument(document);
+     ui->pdfView->displayPage(ui->pdfView->currentPage);
 }
 
 void NoteTaker::on_actionExit_triggered()
@@ -174,12 +163,10 @@ void NoteTaker::on_actionSave_triggered()
     createPdfFromTex(currentFile);
 
     //Load the corresponding pdf file for the .tex file
-    document = loadPdf(currentFile.left(currentFile.length()-3)+"pdf");
+    std::unique_ptr<Poppler::Document> document = loadPdf((currentFile.left(currentFile.length()-3)+"pdf"));
 
-    if (document != nullptr){
-        pages = loadPagesAsPixmap(document,zoom);
-        setPdfView(pages->at(0));
-    }
+    ui->pdfView->setDocument(document);
+    ui->pdfView->displayPage(ui->pdfView->currentPage);
 }
 
 void NoteTaker::on_actionToggle_PDF_View_triggered()

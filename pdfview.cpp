@@ -1,16 +1,17 @@
 #include "pdfview.h"
-#include <QWidget>
-#include <QTextStream>
-#include <QtEvents>
+
+
 
 PdfView::PdfView(QWidget* parent):
-    QGraphicsView(parent){
+    QGraphicsView(parent),
+    currentPage{0},
+    document{nullptr},
+    zoom{120.0}{
 
-    QTextStream(stdout) << parent;
 }
 
 PdfView::~PdfView(){
-
+    document.reset();
 }
 
 void PdfView::keyPressEvent(QKeyEvent *event){
@@ -18,19 +19,111 @@ void PdfView::keyPressEvent(QKeyEvent *event){
     // CTRL + Keyboard Events
     if (event->modifiers() & Qt::KeyboardModifier::ControlModifier){
         QTextStream(stdout) << event->key();
-
         switch(event->key()){
-
             case(Qt::Key::Key_Backslash):{
-                QTextStream(stdout) << "Success";
                 emit focusToggled();
+                break;
+            }
+            case(Qt::Key::Key_Down):{
+                if(document->numPages() > currentPage + 1){
+                    currentPage++;
+                    displayPage(currentPage);
+                    verticalScrollBar()->setValue(0);
+                }
+                break;
+            }
+            case(Qt::Key::Key_Up):{
+                if(currentPage!=0){
+                    currentPage--;
+                    displayPage(currentPage);
+                    verticalScrollBar()->setValue(0);
+                }
+                break;
+            }
+            case(Qt::Key::Key_Equal):{
+                zoom += 20.0;
+                displayPage(currentPage);
+                break;
+            }
+            case(Qt::Key::Key_Minus):{
+                zoom -= 20.0;
+                displayPage(currentPage);
+                break;
             }
 
+        }
+        }
+    else {
+        switch(event->key()){
+            case(Qt::Key::Key_Down):{
+                QScrollBar * bar = verticalScrollBar();
+                bar->setValue(bar->value()+25);
+                break;
+            }
+            case(Qt::Key::Key_Up):{
+                QScrollBar * bar = verticalScrollBar();
+                bar->setValue(bar->value()-25);
+                break;
+            }
+
+            case(Qt::Key::Key_Left):{
+                QScrollBar * bar = horizontalScrollBar();
+                bar->setValue(bar->value()-25);
+                break;
+            }
+            case(Qt::Key::Key_Right):{
+                QScrollBar * bar = horizontalScrollBar();
+                bar->setValue(bar->value()+25);
+                break;
+            }
         }
     }
 }
 
+void PdfView::setDocument(std::unique_ptr<Poppler::Document> &pdfDoc){
+    this->document = std::move(pdfDoc);
+}
 
-void PdfView::slotTest(){
-    QTextStream(stdout) << "\nSlot Activated";
+void PdfView::displayPage(int pageNumber)
+{
+    // Check that document is valid
+    if (document == nullptr){
+        return;
+    }
+
+    //Get the i'th page
+    Poppler::Page* page{document->page(pageNumber)};
+
+    //Add the pixmap image to the vectors
+    QPixmap pagePixmap = QPixmap::fromImage(
+               page->renderToImage(zoom,zoom,1.3*zoom,0*zoom,5.8*zoom,10*zoom));
+
+    displayPixmap(pagePixmap);
+
+}
+
+void PdfView::displayPixmap(QPixmap pagePixmap){
+    pageScene.clear();
+    pageScene.addPixmap(pagePixmap);
+    pageScene.setSceneRect(pagePixmap.rect());
+    this->setScene(&pageScene);
+}
+
+std::unique_ptr<Poppler::Document> loadPdf(QString path)
+{
+    //Load the pdf using the poppler library
+    std::unique_ptr<Poppler::Document> document{Poppler::Document::load(path)};
+    //Check if the document is locked
+    if (!document || document->isLocked()){
+        document.reset();
+        return nullptr;
+
+    }
+
+    document->setRenderHint( Poppler::Document::Antialiasing);
+    document->setRenderHint( Poppler::Document::TextAntialiasing);
+    document->setRenderHint( Poppler::Document::TextHinting);
+
+
+    return document;
 }

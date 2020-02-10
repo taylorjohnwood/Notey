@@ -1,16 +1,23 @@
 #ifndef LATEXTEXTEDITOR_H
 #define LATEXTEXTEDITOR_H
 
+#include <QTextEdit>
+#include <QTextStream>
+#include <QtEvents>
 #include <QWidget>
-
-class latexTextEditor : public QWidget
-{
+#include <QObject>
+class LatexTextEditor : public QTextEdit{
     Q_OBJECT
+
 public:
-    explicit latexTextEditor(QWidget *parent = nullptr);
+    explicit LatexTextEditor(QWidget *parent = 0);
+    virtual ~LatexTextEditor();
 
 signals:
+     void focusToggled();
 
+private:
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // LATEXTEXTEDITOR_H
