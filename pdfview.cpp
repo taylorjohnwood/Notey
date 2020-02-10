@@ -96,7 +96,7 @@ void PdfView::displayPage(int pageNumber)
 
     //Add the pixmap image to the vectors
     QPixmap pagePixmap = QPixmap::fromImage(
-               page->renderToImage(zoom,zoom,1.3*zoom,0*zoom,5.8*zoom,10*zoom));
+               page->renderToImage(zoom,zoom,1.3*zoom,1.3*zoom,5.8*zoom,10*zoom));
 
     displayPixmap(pagePixmap);
 

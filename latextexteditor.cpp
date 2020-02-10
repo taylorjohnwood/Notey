@@ -10,14 +10,12 @@ LatexTextEditor::~LatexTextEditor(){
 }
 
 
-
 void LatexTextEditor::keyPressEvent(QKeyEvent *event){
 
     QTextEdit::keyPressEvent(event);
 
     // CTRL + Keyboard Events
     if (event->modifiers() & Qt::KeyboardModifier::ControlModifier){
-        QTextStream(stdout) << event->key();
         switch(event->key()){
         case Qt::Key::Key_Backslash:
             emit focusToggled();

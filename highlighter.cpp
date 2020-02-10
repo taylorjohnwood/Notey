@@ -69,8 +69,9 @@ Highlighter::Highlighter(QTextDocument *parent)
 
 
     begEndFormat.setForeground(Qt::red);
-    rule.pattern = QRegularExpression(QStringLiteral("begin|end"));
+    rule.pattern = QRegularExpression(QStringLiteral("\\\\(begin|end)\\{\\w+\\}"));
     rule.format = begEndFormat;
+    rule.group = 1;
     highlightingRules.append(rule);
 
     singleLineCommentFormat.setForeground(Qt::red);
@@ -101,7 +102,7 @@ void Highlighter::highlightBlock(const QString &text)
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext()) {
             QRegularExpressionMatch match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength(), rule.format);
+            setFormat(match.capturedStart(rule.group), match.capturedLength(rule.group), rule.format);
         }
     }
 

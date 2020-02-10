@@ -44,6 +44,13 @@
         <height>0</height>
        </size>
       </property>
+      <property name="styleSheet">
+       <string notr="true">*:focus{
+border-color: rgb(85, 85, 255);
+border-width: 1px;
+border-style: solid;
+}</string>
+      </property>
      </widget>
     </item>
     <item row="1" column="1">
@@ -65,6 +72,13 @@
         <family>Source Code Pro</family>
         <pointsize>12</pointsize>
        </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">*:focus{
+border-color: rgb(85, 85, 255);
+border-width: 1px;
+border-style: solid;
+}</string>
       </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

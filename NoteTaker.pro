@@ -24,7 +24,7 @@ SOURCES += \
     main.cpp \
     notetaker.cpp \
     pdfview.cpp \
-    snippets.cpp \
+    snippetcontroller.cpp \
     stringutilities.cpp
 
 HEADERS += \
@@ -34,7 +34,7 @@ HEADERS += \
     latextexteditor.h \
     notetaker.h \
     pdfview.h \
-    snippets.h \
+    snippetcontroller.h \
     stringutilities.h
 
 FORMS += \

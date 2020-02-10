@@ -20,6 +20,7 @@ private:
     {
         QRegularExpression pattern;
         QTextCharFormat format;
+        int group{0};
     };
     QVector<HighlightingRule> highlightingRules;
 
