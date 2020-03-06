@@ -20,7 +20,7 @@ int saveTextToFile(QString text, QString path){
 void createPdfFromTex(QString path){
     //Compile the .tex file into a pdf
     std::system(
-                "latexmk --pdf --cd --interaction=batchmode "
+                "source ~/.bashrc && latexmk --pdf --cd --interaction=batchmode "
                 + path.toUtf8()
                 );
 

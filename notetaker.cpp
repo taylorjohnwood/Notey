@@ -5,16 +5,20 @@ NoteTaker::NoteTaker(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::NoteTaker)
 {
+    QTextStream(stdout) << "Initialising GUI\n";
     initGUI();
+    QTextStream(stdout) << "GUI initialised, now setting up "
+                           "signals and slots...\n";
     setupSignalsAndSlots();
-    initEnvironmentInput();
+    QTextStream(stdout) << "Signals and slots successfully setup\n";
+
 }
 
 NoteTaker::~NoteTaker()
 {
     delete ui;
     delete highlighter;
-    delete envInput;
+
 }
 
 void NoteTaker::initGUI(){
@@ -32,6 +36,8 @@ void NoteTaker::initGUI(){
     scene.reset(new QGraphicsScene);
 
     zoom = 240;
+
+    on_actionNew_triggered();
 }
 
 void NoteTaker::setupSignalsAndSlots(){
@@ -42,32 +48,9 @@ void NoteTaker::setupSignalsAndSlots(){
 
     //Allow pdfView to give up focus to the latex text editor
     connect(ui->pdfView, &PdfView::focusToggled,
-                     ui->mainTextEdit, QOverload<>::of(&LatexTextEditor::setFocus) );
+                     ui->mainTextEdit, QOverload<>::of(&LatexTextEditor::setFocus));
 
 
-}
-
-void NoteTaker::initEnvironmentInput(){
-
-    //Create the input widget, which user types environment into
-    envInput = new QInputDialog(this);
-    envInput->setLabelText("Environment");
-    envInput->setInputMode(QInputDialog::TextInput);
-
-    //Create a list of the environment options
-    QStringList environments = QStringList();
-    environments << "display" << "enumerate"
-                 <<"itemize"  << "template";
-
-    //Create the autocompleter object for the input widget
-    envCompleter = new QCompleter(environments,this);
-    envCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-
-    //Find the text box in the input dialogue
-    QLineEdit * textInput = envInput->findChild<QLineEdit*>();
-
-    //Attatch the autocompleter object to it
-    textInput->setCompleter(envCompleter);
 }
 
 void NoteTaker::on_actionNew_triggered()
@@ -81,6 +64,13 @@ void NoteTaker::on_actionNew_triggered()
 
     //Change the filename label
     ui->filenameTextBrowser->setText(currentFile);
+
+    ui->mainTextEdit->previousPos = 0;
+    ui->mainTextEdit->previousBufferSize = 0;
+
+    QTextStream(stdout) << "\nOpening: " << currentFile <<"\n"
+                        << "Starting pos: " << ui->mainTextEdit->previousPos
+                        << "\nBuffer size: " << ui->mainTextEdit->previousBufferSize <<'\n';
 }
 
 void NoteTaker::on_actionOpen_triggered()
@@ -123,6 +113,13 @@ void NoteTaker::on_actionOpen_triggered()
 
     ui->pdfView->setDocument(document);
     ui->pdfView->displayPage(ui->pdfView->currentPage);
+
+    ui->mainTextEdit->previousPos = ui->mainTextEdit->textCursor().position();
+    ui->mainTextEdit->previousBufferSize = ui->mainTextEdit->toPlainText().length();
+
+    QTextStream(stdout) << "\nOpening: " << currentFile <<"\n"
+                        << "Starting pos: " << ui->mainTextEdit->previousPos
+                        << "Buffer size: " << ui->mainTextEdit->previousBufferSize;
 }
 
 void NoteTaker::on_actionSave_As_triggered()
@@ -188,51 +185,6 @@ void NoteTaker::on_actionToggle_Console_triggered()
     ui->console->setVisible(!ui->console->isVisible());
 }
 
-void NoteTaker::setPdfView(QPixmap pixmap)
-{
-    /*
-     * Sets the pixmap image for the graphics view widget.
-     * Used to display the pdf pages.
-     */
-
-
-    scene->addPixmap(pixmap);
-    scene->setSceneRect(pixmap.rect());
-    ui->pdfView->setScene(scene.get());
-}
-
-void NoteTaker::on_actionEnvironment_Dialogue_triggered()
-{
-    QString text = "";
-
-    if(envInput->exec()){
-        text = envInput->textValue();
-        envInput->setTextValue("");
-    }
-
-    if (text=="display"){
-        insertSnippet("\\[\n{$1}\n\\]",0);
-
-    } else if(text=="enumerate"){
-        insertSnippet("""\\begin{enumerate}\n"
-                        "\t\\item\n"
-                        "\t\t{$1}\n"
-                        "\\end{enumerate}""",0);
-
-    } else if (text=="itemize"){
-        insertSnippet("""\\begin{itemize}\n"
-                                "\t\\item\n"
-                                    "\t\t{$1}\n"
-                              "\\end{itemize}""",0);
-
-    } else if (text=="template"){
-        insertSnippet("""\\documentclass{article}\n"
-                      "\\begin{document}\n"
-                      "{$1}\n"
-                      "\\end{document}""",0);
-    }
-
-}
 
 void NoteTaker::on_actionAdd_Subject_triggered()
 {
@@ -255,67 +207,3 @@ void NoteTaker::on_actionAdd_Chapter_triggered()
 
 }
 
-void NoteTaker::on_mainTextEdit_textChanged()
-{
-    //Find the word (only behind) under the cursor
-    QString word{""};
-    QTextCursor cursor = ui->mainTextEdit->textCursor();
-    int i = cursor.position();
-    QString text = ui->mainTextEdit->toPlainText();
-
-    do{
-        i--;
-        if(i<0){
-            break;
-        }else if((text[i]==' ') || (text[i]=='\n')){
-            break;
-        }
-        word.prepend(text[i]);
-
-    }while(true);
-
-
-    //Check the word to see if it matches an environment
-    if (word == "dm"){
-        insertSnippet("\\[\n{$1}\n\\]",2);
-
-    } else if (word == "//"){
-        insertSnippet("\\frac{{$1}}{}",2);
-
-    }else if (word=="bgg"){
-        insertSnippet("""\\begin{{$1}}\n"
-                      "\t\n"
-                      "\\end{}""",3);
-    }
-
-}
-
-void NoteTaker::insertSnippet(QString snippet, int triggerLength){
-    // Get a copy of the text cursor
-    QTextCursor cursor = ui->mainTextEdit->textCursor();
-
-    //Save its position before inserting snippet
-    int currentPos = cursor.position();
-
-    //Get the desired position of the cursor after inserting
-    int posOffset = snippet.indexOf("{$1}");
-
-
-
-    //Remove the position indicators from the text
-    snippet = snippet.remove(QRegularExpression("\\{\\$\\d\\}"));
-
-    //Remove the snippet trigger
-    ui->mainTextEdit->setPlainText(ui->mainTextEdit->toPlainText().remove(currentPos-triggerLength,triggerLength));
-
-    //Insert the snippet
-    cursor.setPosition(currentPos-triggerLength);
-    cursor.insertText(snippet);
-
-    //Update the cursor position
-    //Have to minus at end due to deleted trigger word
-    cursor.setPosition(currentPos + posOffset - triggerLength);
-
-    //Apply the changed cursor to the actual text cursor
-    ui->mainTextEdit->setTextCursor(cursor);
-}

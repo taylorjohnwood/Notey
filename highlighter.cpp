@@ -56,8 +56,9 @@ Highlighter::Highlighter(QTextDocument *parent)
 {
     HighlightingRule rule;
 
-    keywordFormat.setForeground(Qt::darkBlue);
+    keywordFormat.setForeground(QBrush(QColor(97, 175, 239)));
     const QString keywordPatterns[] = {QStringLiteral("\\\\\\w+")};
+
 
     for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
@@ -68,8 +69,8 @@ Highlighter::Highlighter(QTextDocument *parent)
 
 
 
-    begEndFormat.setForeground(Qt::red);
-    rule.pattern = QRegularExpression(QStringLiteral("\\\\(begin|end)\\{\\w+\\}"));
+    begEndFormat.setForeground(QBrush(QColor(224, 108, 113)));
+    rule.pattern = QRegularExpression(QStringLiteral("(\\\\(begin|end))\\{\\w+\\}"));
     rule.format = begEndFormat;
     rule.group = 1;
     highlightingRules.append(rule);
