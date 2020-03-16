@@ -19,9 +19,16 @@ int saveTextToFile(QString text, QString path){
 
 void createPdfFromTex(QString path){
     //Compile the .tex file into a pdf
+    //export PATH=~/.TinyTeX/bin/x86_64-linux:$PATH
+//    std::system(
+//                "export PATH=~/.TinyTeX/bin/x86_64-linux:$PATH && latexmk --pdf --cd --interaction=batchmode "
+//                + path.toUtf8()
+//                );
     std::system(
-                "latexmk --pdf --cd --interaction=batchmode "
-                + path.toUtf8()
+                "Rscript /home/taylor/Scripts/compileTexDoc.R \""
+                + path.toUtf8() +"\""
                 );
+
+    QTextStream(stdout) << path.toUtf8();
 
 }

@@ -1,0 +1,21 @@
+start snip dm
+\[
+\t{$1}
+\]
+end snip
+
+start snip //
+\frac{{$1}}{{$2}}
+end snip
+
+start snip beg
+\begin{{$1}}
+    \t{$2}
+\end{{$1}}
+end snip
+
+start snip begi
+\begin{itemize}
+    \t{$1}
+\end{itemize}
+end snip

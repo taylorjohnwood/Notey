@@ -1,7 +1,5 @@
 #include "pdfview.h"
 
-
-
 PdfView::PdfView(QWidget* parent):
     QGraphicsView(parent),
     currentPage{0},
@@ -87,7 +85,7 @@ void PdfView::setDocument(std::unique_ptr<Poppler::Document> &pdfDoc){
 void PdfView::displayPage(int pageNumber)
 {
     // Check that document is valid
-    if (document == nullptr){
+    if (!document){
         return;
     }
 
@@ -95,11 +93,9 @@ void PdfView::displayPage(int pageNumber)
     Poppler::Page* page{document->page(pageNumber)};
 
     //Add the pixmap image to the vectors
-    QPixmap pagePixmap = QPixmap::fromImage(
-               page->renderToImage(zoom,zoom,1.3*zoom,1.3*zoom,5.8*zoom,10*zoom));
-
+    QImage pageImage = page->renderToImage(zoom,zoom,1.3*zoom,1.3*zoom,5.8*zoom,10*zoom);
+    QPixmap pagePixmap = QPixmap::fromImage(pageImage);
     displayPixmap(pagePixmap);
-
 }
 
 void PdfView::displayPixmap(QPixmap pagePixmap){

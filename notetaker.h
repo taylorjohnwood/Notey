@@ -59,13 +59,10 @@ private slots:
 
     void on_actionToggle_Console_triggered();
 
-    void on_actionEnvironment_Dialogue_triggered();
-
     void on_actionAdd_Subject_triggered();
 
     void on_actionAdd_Chapter_triggered();
 
-    void on_mainTextEdit_textChanged();
 
 
 private:
@@ -86,7 +83,6 @@ private:
     void setPdfView(QPixmap pixmap);
     void initGUI();
     void initEnvironmentInput();
-    void insertSnippet(QString snippet, int triggerLength);
     void setupSignalsAndSlots();
 
 

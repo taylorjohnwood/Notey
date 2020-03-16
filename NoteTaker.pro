@@ -17,7 +17,6 @@ DEFINES += DQT_NO_VERSION_TAGGING
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    environments.cpp \
     fileutilities.cpp \
     highlighter.cpp \
     latextexteditor.cpp \
@@ -28,7 +27,6 @@ SOURCES += \
     stringutilities.cpp
 
 HEADERS += \
-    environments.h \
     fileutilities.h \
     highlighter.h \
     latextexteditor.h \
@@ -54,3 +52,6 @@ RESOURCES += \
 
 
 unix:!macx: LIBS += -lpoppler-qt5
+
+DISTFILES += \
+    snippets.snips
