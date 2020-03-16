@@ -17,36 +17,6 @@ LatexTextEditor::~LatexTextEditor(){
 
 }
 
-<<<<<<< HEAD
-=======
-
-void LatexTextEditor::onTextChanged(){
-    int deltaSize{};
-    if (snipCont->currentSnippet != nullptr){
-        if (previousPos <= snipCont->currentSnippet->endPos){
-            int deltaSize = toPlainText().length() - previousBufferSize;
-            snipCont->currentSnippet->endPos += deltaSize;
-
-            if (previousPos <= snipCont->currentSnippet->startPos){
-                snipCont->currentSnippet->startPos += deltaSize;
-            }
-
-        }
-        QTextStream(stdout) << "\nDelta size: " << deltaSize << '\n'
-                            << "Text changed and Snippet exists with data;\n"
-                            << "Start Position: " << snipCont->currentSnippet->startPos << '\n'
-                            << "End Position: " << snipCont->currentSnippet->endPos << '\n'
-                            << "Size: " << snipCont->currentSnippet->size() << '\n';
-    }
-    if (snipCont->previousWord() == "dm" or snipCont->previousWord() == "beg" or snipCont->previousWord() == "mk"){
-        snipCont->insertSnippet();
-    }
-
-    QTextStream(stdout) << "\nCursor now at position: "<< textCursor().position()
-                        << "\nBuffer size is now: " << toPlainText().length() << '\n';
-    previousPos = textCursor().position();
-    previousBufferSize = toPlainText().length();
->>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
 
 void LatexTextEditor::onTextChanged(){
     int deltaSize{toPlainText().length() - previousBufferSize};

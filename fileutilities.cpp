@@ -25,13 +25,8 @@ void createPdfFromTex(QString path){
 //                + path.toUtf8()
 //                );
     std::system(
-<<<<<<< HEAD
                 "Rscript /home/taylor/Scripts/compileTexDoc.R \""
                 + path.toUtf8() +"\""
-=======
-                "source ~/.bashrc && latexmk --pdf --cd --interaction=batchmode "
-                + path.toUtf8()
->>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
                 );
 
     QTextStream(stdout) << path.toUtf8();

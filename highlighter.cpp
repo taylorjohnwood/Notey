@@ -70,11 +70,7 @@ Highlighter::Highlighter(QTextDocument *parent)
 
 
     begEndFormat.setForeground(QBrush(QColor(224, 108, 113)));
-<<<<<<< HEAD
     rule.pattern = QRegularExpression(QStringLiteral("(\\\\(begin|end))\\{\\w*\\}"));
-=======
-    rule.pattern = QRegularExpression(QStringLiteral("(\\\\(begin|end))\\{\\w+\\}"));
->>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
     rule.format = begEndFormat;
     rule.group = 1;
     highlightingRules.append(rule);
