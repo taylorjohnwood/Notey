@@ -68,6 +68,7 @@ QString SnippetController::getSnipContents(QString trigger){
     else if (trigger=="beg"){
         return "\\begin\{{$1}}\n\t\n\\end\{{$2}}";
     }
+<<<<<<< HEAD
     else if (trigger=="ibeg"){
         return "\\begin\{itemize}\n\\item\n\t{$1}\n\\end\{itemize}";
     }
@@ -79,11 +80,16 @@ QString SnippetController::getSnipContents(QString trigger){
     }
     else if (trigger=="ii"){
         return "\\item\n\t{$1}";
+=======
+    else if (trigger=="mk"){
+        return "${$1}$";
+>>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
     }
 
     return "";
 }
 
+<<<<<<< HEAD
 void SnippetController::insertSnippet(QString trigger){
 
     QString contents = getSnipContents(trigger);
@@ -95,10 +101,14 @@ void SnippetController::insertSnippet(QString trigger){
     if (currentSnippet){
         delete currentSnippet;
     }
+=======
+void SnippetController::insertSnippet(){
+>>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
 
     //Create a new snippet object
     currentSnippet = new Snippet;
 
+<<<<<<< HEAD
     // Get the snippet contents and load them into a snippet object
     // If there is no snippet for the key word then exit function
 
@@ -165,4 +175,50 @@ void Snippet::loadFromQString(QString snipContents){
 
     }
     text = snipContents;
+=======
+    //Get a copy of the text cursor
+    QTextCursor cursor{parent->textCursor()};
+
+    int position{cursor.position()};
+
+
+    //The trigger word for the snippet
+    QString trigger{previousWord()};
+
+    //The length of the trigger word
+    int triggerLength{trigger.length()};
+
+    //Get the snippet contents and load them into a snippet object
+    currentSnippet->loadFromQString(getSnipContents(trigger));
+    parent->setPlainText(parent->toPlainText().remove(position-triggerLength-1, triggerLength));
+    cursor.setPosition(position-triggerLength-1);
+    parent->setTextCursor(cursor);
+    parent->insertPlainText(currentSnippet->text);
+    cursor.setPosition(position-1-triggerLength+currentSnippet->stops.front());
+    parent->setTextCursor(cursor);
+
+    currentSnippet->startPos = position - triggerLength -1;
+    currentSnippet->endPos = position + currentSnippet->text.length()-1;
+
+    QTextStream(stdout) << "\nSnippet with trigger \"" << trigger <<"\""
+                        << " has been inserted at: " << currentSnippet->startPos
+                        << '\n';
+
+
+}
+
+void Snippet::loadFromQString(QString snipContents){
+
+
+    for (int stopIndex = snipContents.indexOf(QRegularExpression("\\{\\$\\d\\}"));
+         stopIndex!=-1;
+         stopIndex = snipContents.indexOf(QRegularExpression("\\{\\$\\d\\}"))){
+
+        stops.push_back(stopIndex);
+        QTextStream(stdout) << "Adding stop " << stopIndex << '\n';
+        snipContents.remove(stopIndex, 4);
+    }
+    text = snipContents;
+    currentStop = stops.begin();
+>>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
 }

@@ -94,7 +94,24 @@ void PdfView::displayPage(int pageNumber)
 
     //Add the pixmap image to the vectors
     QImage pageImage = page->renderToImage(zoom,zoom,1.3*zoom,1.3*zoom,5.8*zoom,10*zoom);
+<<<<<<< HEAD
     QPixmap pagePixmap = QPixmap::fromImage(pageImage);
+=======
+//            .convertToFormat(QImage::Format::Format_Grayscale16);
+//    pageImage.invertPixels();
+
+//    QTextStream(stdout) << pageImage.pixelColor(20,20).rgba();
+//    for (int y=0; y<pageImage.height(); y++){
+//        for(int x=0; x<pageImage.width(); x++){
+//            if (qGray(pageImage.pixelColor(x,y).rgb()) < qGray(10,10,10)){
+//                pageImage.setPixel(x,y, qRgb(40, 44, 52));
+//        }
+//    }}
+
+    QPixmap pagePixmap = QPixmap::fromImage(pageImage);
+
+
+>>>>>>> 06d60f23343caa570edac0bcedf0b10de2389375
     displayPixmap(pagePixmap);
 }
 
